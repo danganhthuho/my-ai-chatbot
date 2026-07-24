@@ -2,89 +2,441 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>My AI Chatbot</title>
 
   <style>
-    body {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0 20px;
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    #chat {
-      min-height: 400px;
-      padding: 16px;
-      border: 1px solid #cccccc;
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+
+    .sidebar {
+      width: 250px;
+      background: #111827;
+      color: white;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    .new-chat-button {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #374151;
       border-radius: 10px;
-      margin-bottom: 16px;
+      background: #1f2937;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .new-chat-button:hover {
+      background: #374151;
+    }
+
+    .sidebar-info {
+      margin-top: auto;
+      color: #9ca3af;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Main area */
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .header {
+      height: 70px;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    /* Chat */
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px 20px 160px;
+    }
+
+    .chat {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .welcome {
+      text-align: center;
+      margin-top: 80px;
+      padding: 20px;
+    }
+
+    .welcome-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: #111827;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+    }
+
+    .welcome h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 22px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .message-row.user-row {
+      justify-content: flex-end;
+    }
+
+    .message-row.assistant-row {
+      justify-content: flex-start;
     }
 
     .message {
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+      max-width: 75%;
+      padding: 13px 16px;
+      border-radius: 16px;
+      line-height: 1.6;
+      font-size: 15px;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
-    .user {
-      background-color: #eeeeee;
+    .user-message {
+      background: #111827;
+      color: white;
+      border-bottom-right-radius: 5px;
     }
 
-    .assistant {
-      background-color: #dddddd;
+    .assistant-message {
+      background: white;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      border-bottom-left-radius: 5px;
     }
 
-    form {
+    .loading-message {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    /* Input area */
+
+    .input-area {
+      position: fixed;
+      bottom: 0;
+      left: 250px;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(
+        to top,
+        #f4f6f8 75%,
+        rgba(244, 246, 248, 0)
+      );
+    }
+
+    .input-wrapper {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .chat-form {
       display: flex;
+      align-items: center;
       gap: 10px;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 18px;
+      padding: 8px 8px 8px 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
-    input {
+    .chat-form:focus-within {
+      border-color: #111827;
+    }
+
+    #message-input {
       flex: 1;
-      padding: 12px;
+      border: none;
+      outline: none;
       font-size: 16px;
+      padding: 10px 0;
+      background: transparent;
+      min-width: 0;
     }
 
-    button {
-      padding: 12px 18px;
-      font-size: 16px;
+    #send-button {
+      width: 45px;
+      height: 45px;
+      border: none;
+      border-radius: 13px;
+      background: #111827;
+      color: white;
+      font-size: 20px;
       cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #send-button:hover {
+      background: #374151;
+      transform: translateY(-1px);
+    }
+
+    #send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .input-note {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile */
+
+    @media (max-width: 700px) {
+      .sidebar {
+        display: none;
+      }
+
+      .input-area {
+        left: 0;
+      }
+
+      .header {
+        padding: 0 18px;
+      }
+
+      .chat-container {
+        padding: 22px 14px 145px;
+      }
+
+      .message {
+        max-width: 88%;
+      }
+
+      .welcome {
+        margin-top: 40px;
+      }
+
+      .welcome h1 {
+        font-size: 25px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>My AI Chatbot</h1>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">My AI</div>
 
-  <div id="chat"></div>
+      <button class="new-chat-button" id="new-chat-button">
+        ＋ New chat
+      </button>
 
-  <form id="chat-form">
-    <input
-      id="message-input"
-      type="text"
-      placeholder="Type a message..."
-      autocomplete="off"
-      required
-    />
+      <div class="sidebar-info">
+        Built with Node.js, Express and the OpenAI API.
+      </div>
+    </aside>
 
-    <button type="submit">Send</button>
-  </form>
+    <main class="main">
+      <header class="header">
+        <div class="header-title">AI Assistant</div>
+
+        <div class="status">
+          <span class="status-dot"></span>
+          Online
+        </div>
+      </header>
+
+      <section class="chat-container" id="chat-container">
+        <div class="chat" id="chat">
+          <div class="welcome" id="welcome">
+            <div class="welcome-icon">✦</div>
+
+            <h1>How can I help you?</h1>
+
+            <p>
+              Ask a question, request an explanation, or start a
+              conversation.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <form class="chat-form" id="chat-form">
+            <input
+              id="message-input"
+              type="text"
+              placeholder="Message AI..."
+              autocomplete="off"
+              required
+            />
+
+            <button id="send-button" type="submit">
+              ↑
+            </button>
+          </form>
+
+          <div class="input-note">
+            AI may make mistakes. Check important information.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
   <script>
     const form = document.getElementById("chat-form");
     const input = document.getElementById("message-input");
     const chat = document.getElementById("chat");
+    const chatContainer =
+      document.getElementById("chat-container");
+    const sendButton =
+      document.getElementById("send-button");
+    const newChatButton =
+      document.getElementById("new-chat-button");
+
+    function removeWelcomeMessage() {
+      const welcome = document.getElementById("welcome");
+
+      if (welcome) {
+        welcome.remove();
+      }
+    }
+
+    function scrollToBottom() {
+      chatContainer.scrollTop =
+        chatContainer.scrollHeight;
+    }
 
     function displayMessage(text, sender) {
-      const messageElement = document.createElement("div");
+      removeWelcomeMessage();
 
-      messageElement.className = `message ${sender}`;
-      messageElement.textContent = text;
+      const row = document.createElement("div");
+      const message = document.createElement("div");
 
-      chat.appendChild(messageElement);
+      row.className =
+        sender === "user"
+          ? "message-row user-row"
+          : "message-row assistant-row";
+
+      message.className =
+        sender === "user"
+          ? "message user-message"
+          : "message assistant-message";
+
+      message.textContent = text;
+
+      row.appendChild(message);
+      chat.appendChild(row);
+
+      scrollToBottom();
+
+      return row;
+    }
+
+    function displayLoadingMessage() {
+      const row = displayMessage(
+        "AI is thinking...",
+        "assistant"
+      );
+
+      const message = row.querySelector(".message");
+      message.classList.add("loading-message");
+
+      return row;
     }
 
     form.addEventListener("submit", async (event) => {
@@ -97,7 +449,12 @@
       }
 
       displayMessage(message, "user");
+
       input.value = "";
+      input.focus();
+      sendButton.disabled = true;
+
+      const loadingRow = displayLoadingMessage();
 
       try {
         const response = await fetch("/api/chat", {
@@ -112,14 +469,44 @@
 
         const data = await response.json();
 
+        loadingRow.remove();
+
         if (!response.ok) {
-          throw new Error(data.error || "Request failed.");
+          throw new Error(
+            data.error || "Request failed."
+          );
         }
 
         displayMessage(data.reply, "assistant");
       } catch (error) {
-        displayMessage(`Error: ${error.message}`, "assistant");
+        loadingRow.remove();
+
+        displayMessage(
+          `Error: ${error.message}`,
+          "assistant"
+        );
+      } finally {
+        sendButton.disabled = false;
+        input.focus();
       }
+    });
+
+    newChatButton.addEventListener("click", () => {
+      chat.innerHTML = `
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">✦</div>
+
+          <h1>How can I help you?</h1>
+
+          <p>
+            Ask a question, request an explanation,
+            or start a conversation.
+          </p>
+        </div>
+      `;
+
+      input.value = "";
+      input.focus();
     });
   </script>
 </body>
