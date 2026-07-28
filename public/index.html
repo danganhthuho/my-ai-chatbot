@@ -388,6 +388,8 @@
     const newChatButton =
       document.getElementById("new-chat-button");
 
+    let previousResponseId = null;
+
     function removeWelcomeMessage() {
       const welcome = document.getElementById("welcome");
 
@@ -463,7 +465,8 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            message: message,
+          message,
+          previousResponseId,
           }),
         });
 
@@ -477,6 +480,7 @@
           );
         }
 
+        previousResponseId = data.responseId;
         displayMessage(data.reply, "assistant");
       } catch (error) {
         loadingRow.remove();
@@ -492,6 +496,7 @@
     });
 
     newChatButton.addEventListener("click", () => {
+      previousResponseId = null;
       chat.innerHTML = `
         <div class="welcome" id="welcome">
           <div class="welcome-icon">✦</div>

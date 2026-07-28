@@ -15,30 +15,37 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.post("/api/chat", async (req, res) => {
-  try {
-    const userMessage = req.body.message;
-
-    if (!userMessage) {
-      return res.status(400).json({
-        error: "Please enter a message.",
+    try {
+      const { message, previousResponseId } = req.body;
+  
+      if (!message || typeof message !== "string") {
+        return res.status(400).json({
+          error: "Please enter a valid message.",
+        });
+      }
+  
+      const request = {
+        model: "gpt-5-mini",
+        input: message,
+      };
+  
+      if (previousResponseId) {
+        request.previous_response_id = previousResponseId;
+      }
+  
+      const response = await client.responses.create(request);
+  
+      res.json({
+        reply: response.output_text,
+        responseId: response.id,
+      });
+    } catch (error) {
+      console.error(error);
+  
+      res.status(500).json({
+        error: "Something went wrong.",
       });
     }
-
-    const response = await client.responses.create({
-      model: "gpt-5-mini",
-      input: userMessage,
-    });
-
-    res.json({
-      reply: response.output_text,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Something went wrong.",
-    });
-  }
 });
 
 app.listen(port, () => {
