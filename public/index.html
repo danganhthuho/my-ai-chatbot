@@ -10,6 +10,20 @@
   <title>My AI Chatbot</title>
 
   <style>
+    :root {
+      --kitty-red: #e63956;
+      --kitty-dark-red: #c92e48;
+      --kitty-pink: #ffb6c8;
+      --kitty-light-pink: #fff0f5;
+      --kitty-soft-pink: #ffe1ea;
+      --kitty-white: #ffffff;
+      --kitty-cream: #fffaf5;
+      --kitty-text: #5f3c46;
+      --kitty-muted: #a76f7f;
+      --kitty-border: #f4b5c5;
+      --kitty-shadow: rgba(208, 75, 111, 0.15);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,11 +31,15 @@
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      color: #1f2937;
       height: 100vh;
       overflow: hidden;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      color: var(--kitty-text);
+      background:
+        radial-gradient(circle at 10% 20%, #ffffff 0 4px, transparent 5px),
+        radial-gradient(circle at 80% 30%, #ffffff 0 3px, transparent 4px),
+        linear-gradient(135deg, #fff7fa, #ffe7ef);
+      background-size: 70px 70px, 90px 90px, auto;
     }
 
     .app {
@@ -32,80 +50,122 @@
     /* Sidebar */
 
     .sidebar {
-      width: 250px;
-      background: #111827;
-      color: white;
-      padding: 24px 18px;
+      width: 260px;
+      padding: 26px 18px;
       display: flex;
       flex-direction: column;
+      color: var(--kitty-text);
+      background: linear-gradient(
+        180deg,
+        var(--kitty-soft-pink),
+        var(--kitty-light-pink)
+      );
+      border-right: 2px solid var(--kitty-border);
     }
 
     .logo {
-      font-size: 22px;
-      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 28px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--kitty-red);
+    }
+
+    .logo-cat {
+      display: grid;
+      place-items: center;
+      width: 45px;
+      height: 45px;
+      font-size: 24px;
+      background: white;
+      border: 2px solid var(--kitty-border);
+      border-radius: 50%;
+      box-shadow: 0 5px 12px var(--kitty-shadow);
     }
 
     .new-chat-button {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #374151;
-      border-radius: 10px;
-      background: #1f2937;
-      color: white;
+      padding: 13px 16px;
+      border: 2px solid var(--kitty-red);
+      border-radius: 999px;
+      background: white;
+      color: var(--kitty-red);
       font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      transition: 0.2s;
+      transition: 0.2s ease;
     }
 
     .new-chat-button:hover {
-      background: #374151;
+      color: white;
+      background: var(--kitty-red);
+      transform: translateY(-2px);
+      box-shadow: 0 7px 16px var(--kitty-shadow);
     }
 
     .sidebar-info {
       margin-top: auto;
-      color: #9ca3af;
+      padding: 14px;
+      color: var(--kitty-muted);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.6;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--kitty-border);
+      border-radius: 18px;
     }
 
-    /* Main area */
+    /* Main */
 
     .main {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      min-width: 0;
     }
 
     .header {
-      height: 70px;
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
+      height: 72px;
+      padding: 0 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 2px solid var(--kitty-border);
+      backdrop-filter: blur(12px);
     }
 
     .header-title {
-      font-size: 18px;
-      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--kitty-red);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .header-icon {
+      font-size: 22px;
     }
 
     .status {
       display: flex;
       align-items: center;
       gap: 8px;
+      color: var(--kitty-muted);
       font-size: 14px;
-      color: #6b7280;
+      font-weight: 600;
     }
 
     .status-dot {
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
+      background: #72d6a0;
+      border: 2px solid white;
       border-radius: 50%;
-      background: #22c55e;
+      box-shadow: 0 0 0 2px #a8e8c5;
     }
 
     /* Chat */
@@ -123,32 +183,42 @@
     }
 
     .welcome {
+      margin-top: 65px;
+      padding: 26px;
       text-align: center;
-      margin-top: 80px;
-      padding: 20px;
     }
 
     .welcome-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      background: #111827;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 28px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 92px;
+      height: 82px;
+      margin: 0 auto 22px;
+      font-size: 48px;
+      background: white;
+      border: 3px solid var(--kitty-border);
+      border-radius: 45% 45% 42% 42%;
+      box-shadow: 0 12px 28px var(--kitty-shadow);
+    }
+
+    .kitty-bow {
+      position: absolute;
+      top: -12px;
+      right: -11px;
+      font-size: 30px;
+      transform: rotate(10deg);
     }
 
     .welcome h1 {
-      font-size: 30px;
       margin-bottom: 10px;
+      color: var(--kitty-red);
+      font-size: 32px;
     }
 
     .welcome p {
-      color: #6b7280;
-      line-height: 1.6;
+      color: var(--kitty-muted);
+      line-height: 1.7;
     }
 
     .message-row {
@@ -157,54 +227,60 @@
       animation: fadeIn 0.25s ease;
     }
 
-    .message-row.user-row {
+    .user-row {
       justify-content: flex-end;
     }
 
-    .message-row.assistant-row {
+    .assistant-row {
       justify-content: flex-start;
     }
 
     .message {
-      max-width: 75%;
-      padding: 13px 16px;
-      border-radius: 16px;
-      line-height: 1.6;
+      max-width: 76%;
+      padding: 14px 17px;
+      border-radius: 22px;
       font-size: 15px;
+      line-height: 1.65;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
 
     .user-message {
-      background: #111827;
       color: white;
-      border-bottom-right-radius: 5px;
+      background: linear-gradient(
+        135deg,
+        var(--kitty-red),
+        #f05b75
+      );
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 7px 18px var(--kitty-shadow);
     }
 
     .assistant-message {
+      color: var(--kitty-text);
       background: white;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-      border-bottom-left-radius: 5px;
+      border: 2px solid var(--kitty-border);
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 7px 18px rgba(180, 87, 111, 0.1);
     }
 
     .loading-message {
-      color: #6b7280;
+      color: var(--kitty-muted);
       font-style: italic;
     }
 
-    /* Input area */
+    /* Input */
 
     .input-area {
       position: fixed;
-      bottom: 0;
-      left: 250px;
       right: 0;
-      padding: 20px;
+      bottom: 0;
+      left: 260px;
+      padding: 22px;
       background: linear-gradient(
         to top,
-        #f4f6f8 75%,
-        rgba(244, 246, 248, 0)
+        #fff0f5 72%,
+        rgba(255, 240, 245, 0)
       );
     }
 
@@ -217,42 +293,47 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 8px 8px 8px 18px;
       background: white;
-      border: 1px solid #d1d5db;
-      border-radius: 18px;
-      padding: 8px 8px 8px 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 2px solid var(--kitty-border);
+      border-radius: 26px;
+      box-shadow: 0 12px 30px var(--kitty-shadow);
     }
 
     .chat-form:focus-within {
-      border-color: #111827;
+      border-color: var(--kitty-red);
     }
 
     #message-input {
       flex: 1;
+      min-width: 0;
+      padding: 11px 0;
       border: none;
       outline: none;
-      font-size: 16px;
-      padding: 10px 0;
+      color: var(--kitty-text);
       background: transparent;
-      min-width: 0;
+      font-size: 16px;
+    }
+
+    #message-input::placeholder {
+      color: #ca91a2;
     }
 
     #send-button {
-      width: 45px;
-      height: 45px;
+      width: 48px;
+      height: 48px;
       border: none;
-      border-radius: 13px;
-      background: #111827;
+      border-radius: 50%;
       color: white;
+      background: var(--kitty-red);
       font-size: 20px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: 0.2s ease;
     }
 
     #send-button:hover {
-      background: #374151;
-      transform: translateY(-1px);
+      background: var(--kitty-dark-red);
+      transform: scale(1.06) rotate(-5deg);
     }
 
     #send-button:disabled {
@@ -262,16 +343,16 @@
     }
 
     .input-note {
-      text-align: center;
-      color: #9ca3af;
-      font-size: 12px;
       margin-top: 10px;
+      color: var(--kitty-muted);
+      font-size: 12px;
+      text-align: center;
     }
 
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(5px);
+        transform: translateY(7px);
       }
 
       to {
@@ -279,8 +360,6 @@
         transform: translateY(0);
       }
     }
-
-    /* Mobile */
 
     @media (max-width: 700px) {
       .sidebar {
@@ -292,11 +371,11 @@
       }
 
       .header {
-        padding: 0 18px;
+        padding: 0 17px;
       }
 
       .chat-container {
-        padding: 22px 14px 145px;
+        padding: 22px 13px 145px;
       }
 
       .message {
@@ -304,11 +383,11 @@
       }
 
       .welcome {
-        margin-top: 40px;
+        margin-top: 35px;
       }
 
       .welcome h1 {
-        font-size: 25px;
+        font-size: 27px;
       }
     }
   </style>
@@ -317,7 +396,10 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="logo">My AI</div>
+      <div class="logo">
+        <span class="logo-cat">🎀</span>
+        Kitty AI
+      </div>
 
       <button class="new-chat-button" id="new-chat-button">
         ＋ New chat
@@ -330,7 +412,10 @@
 
     <main class="main">
       <header class="header">
-        <div class="header-title">AI Assistant</div>
+        <div class="header-title">
+          <span class="header-icon">🐱</span>
+          Kitty Assistant
+        </div>
 
         <div class="status">
           <span class="status-dot"></span>
@@ -359,13 +444,13 @@
             <input
               id="message-input"
               type="text"
-              placeholder="Message AI..."
+              placeholder="Message Kitty AI..."
               autocomplete="off"
               required
             />
 
-            <button id="send-button" type="submit">
-              ↑
+            <button id="send-button" type="submit" aria-label="Send message">
+              ♥
             </button>
           </form>
 
@@ -460,28 +545,59 @@
 
       try {
         const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
+        method: "POST",
+        headers: {
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-          message,
-          previousResponseId,
-          }),
+        },
+        body: JSON.stringify({
+            message,
+            previousResponseId,
+        }),
         });
 
+        if (!response.ok) {
         const data = await response.json();
+
+        throw new Error(
+            data.error || "Request failed."
+        );
+        }
 
         loadingRow.remove();
 
-        if (!response.ok) {
-          throw new Error(
-            data.error || "Request failed."
-          );
+        const assistantRow = displayMessage("", "assistant");
+        const assistantMessage =
+        assistantRow.querySelector(".message");
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let fullText = "";
+
+        while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) {
+            break;
         }
 
-        previousResponseId = data.responseId;
-        displayMessage(data.reply, "assistant");
+        const chunk = decoder.decode(value, {
+            stream: true,
+        });
+
+        fullText += chunk;
+        assistantMessage.textContent = fullText;
+
+        scrollToBottom();
+        }
+
+        const newResponseId =
+        response.headers.get("X-Response-Id");
+
+        if (newResponseId) {
+        previousResponseId = newResponseId;
+        }
+
       } catch (error) {
         loadingRow.remove();
 
@@ -499,13 +615,15 @@
       previousResponseId = null;
       chat.innerHTML = `
         <div class="welcome" id="welcome">
-          <div class="welcome-icon">✦</div>
+          <div class="welcome-icon">
+            <span class="kitty-face">🐱</span>
+            <span class="kitty-bow">🎀</span>
+          </div>
 
-          <h1>How can I help you?</h1>
+          <h1>Hello, cutie!</h1>
 
           <p>
-            Ask a question, request an explanation,
-            or start a conversation.
+            Ask Kitty AI anything you would like to learn or talk about.
           </p>
         </div>
       `;
