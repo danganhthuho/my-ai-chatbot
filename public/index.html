@@ -475,6 +475,41 @@
 
     let previousResponseId = null;
 
+    function saveChat() {
+      localStorage.setItem("kittyChatHtml", chat.innerHTML);
+
+      if (previousResponseId) {
+        localStorage.setItem(
+          "kittyPreviousResponseId",
+          previousResponseId
+        );
+      } else {
+        localStorage.removeItem(
+          "kittyPreviousResponseId"
+        );
+      }
+    }
+
+    function loadChat() {
+      const savedChat =
+        localStorage.getItem("kittyChatHtml");
+
+      const savedResponseId =
+        localStorage.getItem(
+          "kittyPreviousResponseId"
+        );
+
+      if (savedChat) {
+        chat.innerHTML = savedChat;
+      }
+
+      if (savedResponseId) {
+        previousResponseId = savedResponseId;
+      }
+
+      scrollToBottom();
+    }
+
     function removeWelcomeMessage() {
       const welcome = document.getElementById("welcome");
 
@@ -510,6 +545,7 @@
       chat.appendChild(row);
 
       scrollToBottom();
+      saveChat();
 
       return row;
     }
@@ -613,6 +649,10 @@
 
     newChatButton.addEventListener("click", () => {
       previousResponseId = null;
+      localStorage.removeItem("kittyChatHtml");
+      localStorage.removeItem(
+      "kittyPreviousResponseId"
+      );
       chat.innerHTML = `
         <div class="welcome" id="welcome">
           <div class="welcome-icon">
@@ -630,7 +670,10 @@
 
       input.value = "";
       input.focus();
+
+      saveChat();
     });
+    loadChat();
   </script>
 </body>
 </html>
