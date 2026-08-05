@@ -349,6 +349,50 @@
       text-align: center;
     }
 
+    .suggestions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .suggestion-button {
+        padding: 14px;
+        border: 2px solid var(--kitty-border);
+        border-radius: 16px;
+        background: white;
+        color: var(--kitty-text);
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .suggestion-button:hover {
+        background: var(--kitty-soft-pink);
+        transform: translateY(-2px);
+    }
+
+    .message-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .copy-button {
+      padding: 5px 10px;
+      border: 1px solid var(--kitty-border);
+      border-radius: 999px;
+      color: var(--kitty-red);
+      background: var(--kitty-light-pink);
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .copy-button:hover {
+      color: white;
+      background: var(--kitty-red);
+    }
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -390,27 +434,6 @@
         font-size: 27px;
       }
     }
-    .message-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 10px;
-    }
-
-    .copy-button {
-      padding: 5px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--pink-6);
-      background: var(--pink-1);
-      font-size: 12px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .copy-button:hover {
-      color: white;
-      background: var(--pink-5);
-    }
   </style>
 </head>
 
@@ -447,14 +470,46 @@
       <section class="chat-container" id="chat-container">
         <div class="chat" id="chat">
           <div class="welcome" id="welcome">
-            <div class="welcome-icon">✦</div>
-
-            <h1>How can I help you?</h1>
-
+            <div class="welcome-icon">
+              <span class="kitty-face">🐱</span>
+              <span class="kitty-bow">🎀</span>
+            </div>
+          
+            <h1>Hello, cutie!</h1>
+          
             <p>
-              Ask a question, request an explanation, or start a
-              conversation.
+              Ask Kitty AI anything you would like to learn or talk about.
             </p>
+          
+            <div class="suggestions">
+              <button
+                class="suggestion-button"
+                data-prompt="Explain binary search step by step."
+              >
+                Explain binary search
+              </button>
+          
+              <button
+                class="suggestion-button"
+                data-prompt="Help me create a study plan for today."
+              >
+                Make a study plan
+              </button>
+          
+              <button
+                class="suggestion-button"
+                data-prompt="Review my code and give me beginner-friendly feedback."
+              >
+                Review my code
+              </button>
+          
+              <button
+                class="suggestion-button"
+                data-prompt="Teach me one useful programming concept."
+              >
+                Teach me something
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -544,6 +599,13 @@
         chatContainer.scrollHeight;
     }
 
+    function getCurrentTime() {
+      return new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
     function displayMessage(text, sender) {
       removeWelcomeMessage();
 
@@ -560,7 +622,13 @@
           ? "message user-message"
           : "message assistant-message";
 
-      message.textContent = text;
+      const messageText = document.createElement("div");
+
+      messageText.className = "message-text";
+
+      messageText.textContent = text;
+
+      message.appendChild(messageText);
       message.dataset.time = getCurrentTime();
 
       if (sender === "assistant") {
@@ -594,7 +662,6 @@
       if (!copyButton) {
         return;
       }
-
       try {
         await navigator.clipboard.writeText(
           copyButton.dataset.copyText
@@ -609,6 +676,19 @@
         copyButton.textContent = "Failed";
       }
     });
+
+    chat.addEventListener("click", (event) => {
+
+      const suggestion =
+          event.target.closest(".suggestion-button");
+
+      if (!suggestion) return;
+
+      input.value = suggestion.dataset.prompt;
+
+      form.requestSubmit();
+
+      });
 
     function displayLoadingMessage() {
       const row = displayMessage(
@@ -663,7 +743,7 @@
 
         const assistantRow = displayMessage("", "assistant");
         const assistantMessage =
-        assistantRow.querySelector(".message");
+          assistantRow.querySelector(".message-text");
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -671,27 +751,37 @@
         let fullText = "";
 
         while (true) {
-        const { value, done } = await reader.read();
+          const { value, done } = await reader.read();
 
-        if (done) {
-            break;
+          if (done) {
+              break;
+          }
+
+          const chunk = decoder.decode(value, {
+              stream: true,
+          });
+
+          fullText += chunk;
+          assistantMessage.textContent = fullText;
+
+          scrollToBottom();
         }
 
-        const chunk = decoder.decode(value, {
-            stream: true,
-        });
+        const copyButton =
+            assistantRow.querySelector(".copy-button");
 
-        fullText += chunk;
-        assistantMessage.textContent = fullText;
-
-        scrollToBottom();
+        if (copyButton) {
+            copyButton.dataset.copyText = fullText;
         }
+
+        saveChat();
 
         const newResponseId =
-        response.headers.get("X-Response-Id");
+            response.headers.get("X-Response-Id");
 
         if (newResponseId) {
-        previousResponseId = newResponseId;
+            previousResponseId = newResponseId;
+            saveChat();
         }
 
       } catch (error) {
@@ -725,6 +815,36 @@
           <p>
             Ask Kitty AI anything you would like to learn or talk about.
           </p>
+
+          <div class="suggestions">
+            <button
+              class="suggestion-button"
+              data-prompt="Explain binary search step by step."
+            >
+              Explain binary search
+            </button>
+
+            <button
+              class="suggestion-button"
+              data-prompt="Help me create a study plan for today."
+            >
+              Make a study plan
+            </button>
+
+            <button
+              class="suggestion-button"
+              data-prompt="Review my code and give me beginner-friendly feedback."
+            >
+              Review my code
+            </button>
+
+            <button
+              class="suggestion-button"
+              data-prompt="Teach me one useful programming concept."
+            >
+              Teach me something
+            </button>
+          </div>
         </div>
       `;
 
