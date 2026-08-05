@@ -390,6 +390,27 @@
         font-size: 27px;
       }
     }
+    .message-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .copy-button {
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--pink-6);
+      background: var(--pink-1);
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .copy-button:hover {
+      color: white;
+      background: var(--pink-5);
+    }
   </style>
 </head>
 
@@ -540,6 +561,22 @@
           : "message assistant-message";
 
       message.textContent = text;
+      message.dataset.time = getCurrentTime();
+
+      if (sender === "assistant") {
+        const actions = document.createElement("div");
+        const copyButton =
+          document.createElement("button");
+
+        actions.className = "message-actions";
+        copyButton.className = "copy-button";
+        copyButton.type = "button";
+        copyButton.textContent = "Copy";
+        copyButton.dataset.copyText = text;
+
+        actions.appendChild(copyButton);
+        message.appendChild(actions);
+      }
 
       row.appendChild(message);
       chat.appendChild(row);
@@ -549,6 +586,29 @@
 
       return row;
     }
+
+    chat.addEventListener("click", async (event) => {
+      const copyButton =
+        event.target.closest(".copy-button");
+
+      if (!copyButton) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(
+          copyButton.dataset.copyText
+        );
+
+        copyButton.textContent = "Copied!";
+
+        setTimeout(() => {
+          copyButton.textContent = "Copy";
+        }, 1500);
+      } catch {
+        copyButton.textContent = "Failed";
+      }
+    });
 
     function displayLoadingMessage() {
       const row = displayMessage(
